@@ -1,0 +1,656 @@
+翻转整数
+class Solution {
+public:
+    int reverse(int x) {
+        int res = 0;
+        while (x != 0) {
+            if (abs(res) > INT_MAX / 10) return 0;
+            res = res * 10 + x % 10;
+            x /= 10;
+        }
+        return res;
+    }
+};
+
+整数回文数
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x < 0) return false;
+        int div = 1;
+        while (x / div >= 10) div *= 10;
+        while (x > 0) {
+            int left = x / div;
+            int right = x % 10;
+            if (left != right) return false;
+            x = (x % div) / 10;
+            div /= 100;
+        }
+        return true;
+    }
+};
+
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) return false;
+        int revertNum = 0;
+        while (x > revertNum) {
+            revertNum = revertNum * 10 + x % 10;
+            x /= 10;
+        }
+        return x == revertNum || x == revertNum / 10;
+    }
+};
+
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) return false;
+        return reverse(x) == x;
+    }
+    int reverse(int x) {
+        int res = 0;
+        while (x != 0) {
+            if (res > INT_MAX / 10) return -1;
+            res = res * 10 + x % 10;
+            x /= 10;
+        }
+        return res;
+    }
+};
+
+
+12.整数转换成罗马数
+class Solution {
+public:
+    string intToRoman(int num) {
+        string res = "";
+        vector<char> roman{'M', 'D', 'C', 'L', 'X', 'V', 'I'};
+        vector<int> value{1000, 500, 100, 50, 10, 5, 1};
+        for (int n = 0; n < 7; n += 2) {
+            int x = num / value[n];
+            if (x < 4) {
+                for (int i = 1; i <= x; ++i) res += roman[n];
+            } else if (x == 4) {
+                res = res + roman[n] + roman[n - 1];
+            } else if (x > 4 && x < 9) {
+                res += roman[n - 1];
+                for (int i = 6; i <= x; ++i) res += roman[n];
+            } else if (x == 9) {
+                res = res + roman[n] + roman[n - 2];
+            }
+            num %= value[n];
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string intToRoman(int num) {
+        string res = "";
+        vector<int> val{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        vector<string> str{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        for (int i = 0; i < val.size(); ++i) {
+            while (num >= val[i]) {
+                num -= val[i];
+                res += str[i];
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string intToRoman(int num) {
+        string res = "";
+        vector<string> v1{"", "M", "MM", "MMM"};
+        vector<string> v2{"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+        vector<string> v3{"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+        vector<string> v4{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+        return v1[num / 1000] + v2[(num % 1000) / 100] + v3[(num % 100) / 10] + v4[num % 10];
+    }
+};
+
+
+22.括号生成
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        generateParenthesisDFS(n, n, "", res);
+        return res;
+    }
+    void generateParenthesisDFS(int left, int right, string out, vector<string> &res) {
+        if (left > right) return;
+        if (left == 0 && right == 0) res.push_back(out);
+        else {
+            if (left > 0) generateParenthesisDFS(left - 1, right, out + '(', res);
+            if (right > 0) generateParenthesisDFS(left, right - 1, out + ')', res);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        set<string> t;
+        if (n == 0) t.insert("");
+        else {
+            vector<string> pre = generateParenthesis(n - 1);
+            for (auto a : pre) {
+                for (int i = 0; i < a.size(); ++i) {
+                    if (a[i] == '(') {
+                        a.insert(a.begin() + i + 1, '(');
+                        a.insert(a.begin() + i + 2, ')');
+                        t.insert(a);
+                        a.erase(a.begin() + i + 1, a.begin() + i + 3);
+                    }
+                }
+                t.insert("()" + a);
+            }
+        }
+        return vector<string>(t.begin(), t.end());
+    }
+};
+
+29.两数相处，不能取余
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if (divisor == 0 || (dividend == INT_MIN && divisor == -1)) return INT_MAX;
+        long long m = abs((long long)dividend), n = abs((long long)divisor), res = 0;
+        int sign = ((dividend < 0) ^ (divisor < 0)) ? -1 : 1;
+        if (n == 1) return sign == 1 ? m : -m;
+        while (m >= n) {
+            long long t = n, p = 1;
+            while (m >= (t << 1)) {
+                t <<= 1;
+                p <<= 1;
+            }
+            res += p;
+            m -= t;
+        }
+        return sign == 1 ? res : -res;
+    }
+};
+
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        long long m = abs((long long)dividend), n = abs((long long)divisor), res = 0;
+        if (m < n) return 0;
+        while (m >= n) {
+            long long t = n, p = 1;
+            while (m > (t << 1)) {
+                t <<= 1;
+                p <<= 1;
+            }
+            res += p;
+            m -= t;
+        }
+        if ((dividend < 0) ^ (divisor < 0)) res = -res;
+        return res > INT_MAX ? INT_MAX : res;
+    }
+};
+
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        long long res = 0;
+        long long m = abs((long long)dividend), n = abs((long long)divisor);
+        if (m < n) return 0;
+        long long t = n, p = 1;
+        while (m > (t << 1)) {
+            t <<= 1;
+            p <<= 1;
+        }
+        res += p + divide(m - t, n);
+        if ((dividend < 0) ^ (divisor < 0)) res = -res;
+        return res > INT_MAX ? INT_MAX : res;
+    }
+};
+
+38.报数
+class Solution {
+public:
+    string countAndSay(int n) {
+        if (n <= 0) return "";
+        string res = "1";
+        while (--n) {
+            string cur = "";
+            for (int i = 0; i < res.size(); ++i) {
+                int cnt = 1;
+                while (i + 1 < res.size() && res[i] == res[i + 1]) {
+                    ++cnt;
+                    ++i;
+                }
+                cur += to_string(cnt) + res[i];
+            }
+            res = cur;
+        }
+        return res;
+    }
+};
+
+50.N次幂
+class Solution {
+public:
+    double myPow(double x, int n) {
+        if (n == 0) return 1;
+        double half = myPow(x, n / 2);
+        if (n % 2 == 0) return half * half;
+        if (n > 0) return half * half * x;
+        return half * half / x;
+    }
+};
+
+class Solution {
+public:
+    double myPow(double x, int n) {
+        double res = 1.0;
+        for (int i = n; i != 0; i /= 2) {
+            if (i % 2 != 0) res *= x;
+            x *= x;
+        }
+        return n < 0 ? 1 / res : res;
+    }
+};
+
+51.N皇后
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> res;
+        vector<string> queens(n, string(n, '.'));
+        helper(0, queens, res);
+        return res;
+    }
+    void helper(int curRow, vector<string>& queens, vector<vector<string>>& res) {
+        int n = queens.size();
+        if (curRow == n) {
+            res.push_back(queens);
+            return;
+        }
+        for (int i = 0; i < n; ++i) {
+            if (isValid(queens, curRow, i)) {
+                queens[curRow][i] = 'Q';
+                helper(curRow + 1, queens, res);
+                queens[curRow][i] = '.';
+            }
+        }
+    }
+    bool isValid(vector<string>& queens, int row, int col) {
+        for (int i = 0; i < row; ++i) {
+            if (queens[i][col] == 'Q') return false;
+        }
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; --i, --j) {
+            if (queens[i][j] == 'Q') return false;
+        }
+        for (int i = row - 1, j = col + 1; i >= 0 && j < queens.size(); --i, ++j) {
+            if (queens[i][j] == 'Q') return false;
+        }
+        return true;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> res;
+        vector<int> queenCol(n, -1);
+        helper(0, queenCol, res);
+        return res;
+    }
+    void helper(int curRow, vector<int>& queenCol, vector<vector<string>>& res) {
+        int n = queenCol.size();
+        if (curRow == n) {
+            vector<string> out(n, string(n, '.'));
+            for (int i = 0; i < n; ++i) {
+                out[i][queenCol[i]] = 'Q';
+            }
+            res.push_back(out);
+            return;
+        }
+        for (int i = 0; i < n; ++i) {
+            if (isValid(queenCol, curRow, i)) {
+                queenCol[curRow] = i;
+                helper(curRow + 1, queenCol, res);
+                queenCol[curRow] = -1;
+            }
+        }
+    }
+    bool isValid(vector<int>& queenCol, int row, int col) {
+        for (int i = 0; i < row; ++i) {
+            if (col == queenCol[i] || abs(row - i) == abs(col - queenCol[i])) return false;
+        }
+        return true;
+    }
+};
+
+52.N皇后2，给定一个整数，返回n皇后不同的解决方案的个数
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int res = 0;
+        vector<int> pos(n, -1);
+        helper(pos, 0, res);
+        return res;
+    }
+    void helper(vector<int>& pos, int row, int& res) {
+        int n = pos.size();
+        if (row == n) ++res;
+        for (int col = 0; col < n; ++col) {
+            if (isValid(pos, row, col)) {
+                pos[row] = col;
+                helper(pos, row + 1, res);
+                pos[row] = -1;
+            }
+        }
+    }
+    bool isValid(vector<int>& pos, int row, int col) {
+        for (int i = 0; i < row; ++i) {
+            if (col == pos[i] || abs(row - i) == abs(col - pos[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int res = 0;
+        vector<bool> cols(n), diag(2 * n), anti_diag(2 * n);
+        helper(n, 0, cols, diag, anti_diag, res);
+        return res;
+    }
+    void helper(int n, int row, vector<bool>& cols, vector<bool>& diag, vector<bool>& anti_diag, int& res) {
+        if (row == n) ++res;
+        for (int col = 0; col < n; ++col) {
+            int idx1 = col - row + n, idx2 = col + row;
+            if (cols[col] || diag[idx1] || anti_diag[idx2]) continue;
+            cols[col] = diag[idx1] = anti_diag[idx2] = true;
+            helper(n, row + 1, cols, diag, anti_diag, res);
+            cols[col] = diag[idx1] = anti_diag[idx2] = false;
+        }
+    }
+};
+
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int res = {1, 1, 0, 0, 2, 10, 4, 40, 92, 352, 724, 2680, 14200};
+        return res[n];
+    }
+}
+
+59.生成螺旋矩阵
+class Solution {
+public:
+    vector<vector<int> > generateMatrix(int n) {
+        vector<vector<int> > res(n, vector<int>(n, 0));
+        int val = 1, p = n;
+        for (int i = 0; i < n / 2; ++i, p -= 2) {
+            for (int col = i; col < i + p; ++col)
+                res[i][col] = val++;
+            for (int row = i + 1; row < i + p; ++row)
+                res[row][i + p - 1] = val++;
+            for (int col = i + p - 2; col >= i; --col)
+                res[i + p - 1][col] = val++;
+            for (int row = i + p - 2; row > i; --row)
+                res[row][i] = val++;
+        }
+        if (n % 2 != 0) res[n / 2][n / 2] = val;
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int>> res(n, vector<int>(n, 0));
+        int up = 0, down = n - 1, left = 0, right = n - 1, val = 1;
+        while (true) {
+            for (int j = left; j <= right; ++j) res[up][j] = val++;
+            if (++up > down) break;
+            for (int i = up; i <= down; ++i) res[i][right] = val++;
+            if (--right < left) break;
+            for (int j = right; j >= left; --j) res[down][j] = val++;
+            if (--down < up) break;
+            for (int i = down; i >= up; --i) res[i][left] = val++;
+            if (++left > right) break;
+        }
+        return res;
+    }
+};
+
+
+60.第k个排列
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        string res;
+        string num = "123456789";
+        vector<int> f(n, 1);
+        for (int i = 1; i < n; ++i) f[i] = f[i - 1] * i;
+        --k;
+        for (int i = n; i >= 1; --i) {
+            int j = k / f[i - 1];
+            k %= f[i - 1];
+            res.push_back(num[j]);
+            num.erase(j, 1);
+        }
+        return res;
+    }
+};
+
+62.左上到右下有几种走法，不同路径
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<int> dp(n, 1);
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                dp[j] += dp[j - 1];
+            }
+        }
+        return dp[n - 1];
+    }
+};
+
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        double num = 1, denom = 1;
+        int small = m > n ? n : m;
+        for (int i = 1; i <= small - 1; ++i) {
+            num *= m + n - 1 - i;
+            denom *= i;
+        }
+        return (int)(num / denom);
+    }
+};
+
+63.有障碍物的情况下有几种走法
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        if (obstacleGrid.empty() || obstacleGrid[0].empty() || obstacleGrid[0][0] == 1) return 0;
+        int m = obstacleGrid.size(), n = obstacleGrid[0].size();
+        vector<vector<long>> dp(m + 1, vector<long>(n + 1, 0));
+        dp[0][1] = 1;
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (obstacleGrid[i - 1][j - 1] != 0) continue;
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[m][n];
+    }
+};
+
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        if (obstacleGrid.empty() || obstacleGrid[0].empty() || obstacleGrid[0][0] == 1) return 0;
+        int m = obstacleGrid.size(), n = obstacleGrid[0].size();
+        vector<long> dp(n, 0);
+        dp[0] = 1;
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (obstacleGrid[i][j] == 1) dp[j] = 0;
+                else if (j > 0) dp[j] += dp[j - 1];
+            }
+        }
+        return dp[n - 1];
+    }
+};
+
+69.求根，平方根
+class Solution {
+public:
+    int mySqrt(int x) {
+        if (x <= 1) return x;
+        int left = 0, right = x;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (x / mid >= mid) left = mid + 1;
+            else right = mid;
+        }
+        return right - 1;
+    }
+};
+
+class Solution {
+public:
+    int mySqrt(int x) {
+        if (x == 0) return 0;
+        double res = 1, pre = 0;
+        while (abs(res - pre) > 1e-6) {
+            pre = res;
+            res = (res + x / res) / 2;
+        }
+        return int(res);
+    }
+};
+
+class Solution {
+public:
+    int mySqrt(int x) {
+        long res = x;
+        while (res * res > x) {
+            res = (res + x / res) / 2;
+        }
+        return res;
+    }
+};
+
+
+70.爬楼梯，青蛙跳
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n <= 1) return 1;
+        vector<int> dp(n);
+        dp[0] = 1; dp[1] = 2;
+        for (int i = 2; i < n; ++i) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp.back();
+    }
+};
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        int a = 1, b = 1;
+        while (n--) {
+            b += a;
+            a = b - a;
+        }
+        return a;
+    }
+};
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        vector<int> memo(n + 1);
+        return helper(n, memo);
+    }
+    int helper(int n, vector<int>& memo) {
+        if (n <= 1) return 1;
+        if (memo[n] > 0) return memo[n];
+        return memo[n] = helper(n - 1, memo) + helper(n - 2, memo);
+    }
+};
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        if(n <= 1) return 1;
+        return climbStairs(n / 2) * climbStairs(n - n / 2) + climbStairs(n / 2 - 1) * climbStairs(n - n / 2 - 1);
+    }
+};
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        double root5 = sqrt(5);
+        return (1 / root5) * (pow((1 + root5) / 2, n + 1) - pow((1 - root5) / 2, n + 1));
+    }
+};
+
+77.1到n中所有可能的k个数的组合
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> out;
+        helper(n, k, 1, out, res);
+        return res;
+    }
+    void helper(int n, int k, int level, vector<int>& out, vector<vector<int>>& res) {
+        if (out.size() == k) {res.push_back(out); return;}
+        for (int i = level; i <= n; ++i) {
+            out.push_back(i);
+            helper(n, k, i + 1, out, res);
+            out.pop_back();
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        if (k > n || k < 0) return {};
+        if (k == 0) return {{}};
+        vector<vector<int>> res = combine(n - 1, k - 1);
+        for (auto &a : res) a.push_back(n);
+        for (auto &a : combine(n - 1, k)) res.push_back(a);
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> out(k, 0);
+        int i = 0;
+        while (i >= 0) {
+            ++out[i];
+            if (out[i] > n) --i;
+            else if (i == k - 1) res.push_back(out);
+            else {
+                ++i;
+                out[i] = out[i - 1];
+            }
+        }
+        return res;
+    }
+};

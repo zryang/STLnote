@@ -1,0 +1,351 @@
+两个链表顺序相加
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode *dummy = new ListNode(-1), *cur = dummy;
+        int carry = 0;
+        while (l1 || l2) {
+            int val1 = l1 ? l1->val : 0;
+            int val2 = l2 ? l2->val : 0;
+            int sum = val1 + val2 + carry;
+            carry = sum / 10;
+            cur->next = new ListNode(sum % 10);
+            cur = cur->next;
+            if (l1) l1 = l1->next;
+            if (l2) l2 = l2->next;
+        }
+        if (carry) cur->next = new ListNode(1);
+        return dummy->next;
+    }
+};
+
+19.删除链表倒数第N个节点
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if (!head->next) return NULL;
+        ListNode *pre = head, *cur = head;
+        for (int i = 0; i < n; ++i) cur = cur->next;
+        if (!cur) return head->next;
+        while (cur->next) {
+            cur = cur->next;
+            pre = pre->next;
+        }
+        pre->next = pre->next->next;
+        return head;
+    }
+};
+
+21.合并2个有序链表
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        ListNode *dummy = new ListNode(-1), *cur = dummy;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                cur->next = l1;
+                l1 = l1->next;
+            } else {
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        cur->next = l1 ? l1 : l2;
+        return dummy->next;
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if (!l1) return l2;
+        if (!l2) return l1;
+        if (l1->val < l2->val) {
+            l1->next = mergeTwoLists(l1->next, l2);
+            return l1;
+        } else {
+            l2->next = mergeTwoLists(l1, l2->next);
+            return l2;
+        }
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if (!l1) return l2;
+        if (!l2) return l1;
+        ListNode *head = l1->val < l2->val ? l1 : l2;
+        ListNode *nonhead = l1->val < l2->val ? l2 : l1;
+        head->next = mergeTwoLists(head->next, nonhead);
+        return head;
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if (!l1 || (l2 && l1->val > l2->val)) swap(l1, l2);
+        if (l1) l1->next = mergeTwoLists(l1->next, l2);
+        return l1;
+    }
+};
+
+23.合并k个排序链表
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if (lists.empty()) return NULL;
+        int n = lists.size();
+        while (n > 1) {
+            int k = (n + 1) / 2;
+            for (int i = 0; i < n / 2; ++i) {
+                lists[i] = mergeTwoLists(lists[i], lists[i + k]);
+            }
+            n = k;
+        }
+        return lists[0];
+    }
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        ListNode *dummy = new ListNode(-1), *cur = dummy;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                cur->next = l1;
+                l1 = l1->next;
+            } else {
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        if (l1) cur->next = l1;
+        if (l2) cur->next = l2;
+        return dummy->next;
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto cmp = [](ListNode*& a, ListNode*& b) {
+            return a->val > b->val;
+        };
+        priority_queue<ListNode*, vector<ListNode*>, decltype(cmp) > q(cmp);
+        for (auto node : lists) {
+            if (node) q.push(node);
+        }
+        ListNode *dummy = new ListNode(-1), *cur = dummy;
+        while (!q.empty()) {
+            auto t = q.top(); q.pop();
+            cur->next = t;
+            cur = cur->next;
+            if (cur->next) q.push(cur->next);
+        }
+        return dummy->next;
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        return helper(lists, 0, (int)lists.size() - 1);
+    }
+    ListNode* helper(vector<ListNode*>& lists, int start, int end) {
+        if (start > end) return NULL;
+        if (start == end) return lists[start];
+        int mid = start + (end - start) / 2;
+        ListNode *left = helper(lists, start, mid);
+        ListNode *right = helper(lists, mid + 1, end);
+        return mergeTwoLists(left, right);
+    }
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if (!l1) return l2;
+        if (!l2) return l1;
+        if (l1->val < l2->val) {
+            l1->next = mergeTwoLists(l1->next, l2);
+            return l1;
+        } else {
+            l2->next = mergeTwoLists(l1, l2->next);
+            return l2;
+        }
+    }
+};
+
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        ListNode *dummy = new ListNode(-1), *cur = dummy;
+        unordered_map<int, int> m;
+        int mx = INT_MIN, mn = INT_MAX;
+        for (auto node : lists) {
+            ListNode *t = node;
+            while (t) {
+                mx = max(mx, t->val);
+                mn = min(mn, t->val);
+                ++m[t->val];
+                t = t->next;
+            }
+        }
+        for (int i = mn; i <= mx; ++i) {
+            if (!m.count(i)) continue;
+            for (int j = 0; j < m[i]; ++j) {
+                cur->next = new ListNode(i);
+                cur = cur->next;
+            }
+        }
+        return dummy->next;
+    }
+};
+
+24.两两交换链表中的节点
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        ListNode *dummy = new ListNode(-1), *pre = dummy;
+        dummy->next = head;
+        while (pre->next && pre->next->next) {
+            ListNode *t = pre->next->next;
+            pre->next->next = t->next;
+            t->next = pre->next;
+            pre->next = t;
+            pre = t->next;
+        }
+        return dummy->next;
+    }
+};
+
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (!head || !head->next) return head;
+        ListNode *t = head->next;
+        head->next = swapPairs(head->next->next);
+        t->next = head;
+        return t;
+    }
+};
+
+25.k个一组翻转链表
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if (!head || k == 1) return head;
+        ListNode *dummy = new ListNode(-1), *pre = dummy, *cur = head;
+        dummy->next = head;
+        for (int i = 1; cur; ++i) {
+            if (i % k == 0) {
+                pre = reverseOneGroup(pre, cur->next);
+                cur = pre->next;
+            } else {
+                cur = cur->next;
+            }
+        }
+        return dummy->next;
+    }
+    ListNode* reverseOneGroup(ListNode* pre, ListNode* next) {
+        ListNode *last = pre->next, *cur = last->next;
+        while(cur != next) {
+            last->next = cur->next;
+            cur->next = pre->next;
+            pre->next = cur;
+            cur = last->next;
+        }
+        return last;
+    }
+};
+
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode *dummy = new ListNode(-1), *pre = dummy, *cur = pre;
+        dummy->next = head;
+        int num = 0;
+        while (cur = cur->next) ++num;
+        while (num >= k) {
+            cur = pre->next;
+            for (int i = 1; i < k; ++i) {
+                ListNode *t = cur->next;
+                cur->next = t->next;
+                t->next = pre->next;
+                pre->next = t;
+            }
+            pre = cur;
+            num -= k;
+        }
+        return dummy->next;
+    }
+};
+
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode *cur = head;
+        for (int i = 0; i < k; ++i) {
+            if (!cur) return head;
+            cur = cur->next;
+        }
+        ListNode *new_head = reverse(head, cur);
+        head->next = reverseKGroup(cur, k);
+        return new_head;
+    }
+    ListNode* reverse(ListNode* head, ListNode* tail) {
+        ListNode *pre = tail;
+        while (head != tail) {
+            ListNode *t = head->next;
+            head->next = pre;
+            pre = head;
+            head = t;
+        }
+        return pre;
+    }
+};
+
+61.链表循环右移k位
+class Solution {
+public:
+    ListNode *rotateRight(ListNode *head, int k) {
+        if (!head) return NULL;
+        int n = 0;
+        ListNode *cur = head;
+        while (cur) {
+            ++n;
+            cur = cur->next;
+        }
+        k %= n;
+        ListNode *fast = head, *slow = head;
+        for (int i = 0; i < k; ++i) {
+            if (fast) fast = fast->next;
+        }
+        if (!fast) return head;
+        while (fast->next) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        fast->next = head;
+        fast = slow->next;
+        slow->next = NULL;
+        return fast;
+    }
+};
+
+class Solution {
+public:
+    ListNode *rotateRight(ListNode *head, int k) {
+        if (!head) return NULL;
+        int n = 1;
+        ListNode *cur = head;
+        while (cur->next) {
+            ++n;
+            cur = cur->next;
+        }
+        cur->next = head;
+        int m = n - k % n;
+        for (int i = 0; i < m; ++i) {
+            cur = cur->next;
+        }
+        ListNode *newhead = cur->next;
+        cur->next = NULL;
+        return newhead;
+    }
+};

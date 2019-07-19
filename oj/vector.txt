@@ -1,0 +1,1453 @@
+数组中两个数的和为target
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> m;
+        vector<int> res;
+        for (int i = 0; i < nums.size(); ++i) {
+            m[nums[i]] = i;
+        }
+        for (int i = 0; i < nums.size(); ++i) {
+            int t = target - nums[i];
+            if (m.count(t) && m[t] != i) {
+                res.push_back(i);
+                res.push_back(m[t]);
+                break;
+            }
+        }
+        return res;
+    }
+};
+
+
+两个顺序数组的中位数
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size(), n = nums2.size(), left = (m + n + 1) / 2, right = (m + n + 2) / 2;
+        return (findKth(nums1, 0, nums2, 0, left) + findKth(nums1, 0, nums2, 0, right)) / 2.0;
+    }
+    int findKth(vector<int>& nums1, int i, vector<int>& nums2, int j, int k) {
+        if (i >= nums1.size()) return nums2[j + k - 1];
+        if (j >= nums2.size()) return nums1[i + k - 1];
+        if (k == 1) return min(nums1[i], nums2[j]);
+        int midVal1 = (i + k / 2 - 1 < nums1.size()) ? nums1[i + k / 2 - 1] : INT_MAX;
+        int midVal2 = (j + k / 2 - 1 < nums2.size()) ? nums2[j + k / 2 - 1] : INT_MAX;
+        if (midVal1 < midVal2) {
+            return findKth(nums1, i + k / 2, nums2, j, k - k / 2);
+        } else {
+            return findKth(nums1, i, nums2, j + k / 2, k - k / 2);
+        }
+    }
+};
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size(), n = nums2.size();
+        return (findKth(nums1, nums2, (m + n + 1) / 2) + findKth(nums1, nums2, (m + n + 2) / 2)) / 2.0;
+    }
+    int findKth(vector<int> nums1, vector<int> nums2, int k) {
+        if (nums1.empty()) return nums2[k - 1];
+        if (nums2.empty()) return nums1[k - 1];
+        if (k == 1) return min(nums1[0], nums2[0]);
+        int i = min((int)nums1.size(), k / 2), j = min((int)nums2.size(), k / 2);
+        if (nums1[i - 1] > nums2[j - 1]) {
+            return findKth(nums1, vector<int>(nums2.begin() + j, nums2.end()), k - j);
+        } else {
+            return findKth(vector<int>(nums1.begin() + i, nums1.end()), nums2, k - i);
+        }
+        return 0;
+    }
+};
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size(), n = nums2.size();
+        if (m < n) return findMedianSortedArrays(nums2, nums1);
+        if (n == 0) return ((double)nums1[(m - 1) / 2] + (double)nums1[m / 2]) / 2.0;
+        int left = 0, right = n * 2;
+        while (left <= right) {
+            int mid2 = (left + right) / 2;
+            int mid1 = m + n - mid2;
+            double L1 = mid1 == 0 ? INT_MIN : nums1[(mid1 - 1) / 2];
+            double L2 = mid2 == 0 ? INT_MIN : nums2[(mid2 - 1) / 2];
+            double R1 = mid1 == m * 2 ? INT_MAX : nums1[mid1 / 2];
+            double R2 = mid2 == n * 2 ? INT_MAX : nums2[mid2 / 2];
+            if (L1 > R2) left = mid2 + 1;
+            else if (L2 > R1) right = mid2 - 1;
+            else return (max(L1, L2) + min(R1, R2)) / 2;
+        }
+        return -1;
+    }
+};
+
+
+装最多水的容器：两边高，距离长
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int res = 0, i = 0, j = height.size() - 1;
+        while (i < j) {
+            res = max(res, min(height[i], height[j]) * (j - i));
+            height[i] < height[j] ? ++i : --j;
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int res = 0, i = 0, j = height.size() - 1;
+        while (i < j) {
+            int h = min(height[i], height[j]);
+            res = max(res, h * (j - i));
+            while (i < j && h == height[i]) ++i;
+            while (i < j && h == height[j]) --j;
+        }
+        return res;
+    }
+};
+
+14.最长公共前缀
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if (strs.empty()) return "";
+        string res = "";
+        for (int j = 0; j < strs[0].size(); ++j) {
+            char c = strs[0][j];
+            for (int i = 1; i < strs.size(); ++i) {
+                if (j >= strs[i].size() || strs[i][j] != c) {
+                    return res;
+                }
+            }
+            res.push_back(c);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if (strs.empty()) return "";
+        for (int j = 0; j < strs[0].size(); ++j) {
+            for (int i = 0; i < strs.size(); ++i) {
+                if (j >= strs[i].size() || strs[i][j] != strs[0][j]) {
+                    return strs[i].substr(0, j);
+                }
+            }
+        }
+        return strs[0];
+    }
+};
+
+15.三数之合
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        if (nums.empty() || nums.back() < 0 || nums.front() > 0) return {};
+        for (int k = 0; k < nums.size(); ++k) {
+            if (nums[k] > 0) break;
+            if (k > 0 && nums[k] == nums[k - 1]) continue;
+            int target = 0 - nums[k];
+            int i = k + 1, j = nums.size() - 1;
+            while (i < j) {
+                if (nums[i] + nums[j] == target) {
+                    res.push_back({nums[k], nums[i], nums[j]});
+                    while (i < j && nums[i] == nums[i + 1]) ++i;
+                    while (i < j && nums[j] == nums[j - 1]) --j;
+                    ++i; --j;
+                } else if (nums[i] + nums[j] < target) ++i;
+                else --j;
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        set<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        if (nums.empty() || nums.back() < 0 || nums.front() > 0) return {};
+        for (int k = 0; k < nums.size(); ++k) {
+            if (nums[k] > 0) break;
+            int target = 0 - nums[k];
+            int i = k + 1, j = nums.size() - 1;
+            while (i < j) {
+                if (nums[i] + nums[j] == target) {
+                    res.insert({nums[k], nums[i], nums[j]});
+                    while (i < j && nums[i] == nums[i + 1]) ++i;
+                    while (i < j && nums[j] == nums[j - 1]) --j;
+                    ++i; --j;
+                } else if (nums[i] + nums[j] < target) ++i;
+                else --j;
+            }
+        }
+        return vector<vector<int>>(res.begin(), res.end());
+    }
+};
+
+16.最近三数之和
+class Solution {
+public:
+    int threeSumClosest(vector<int>& nums, int target) {
+        int closest = nums[0] + nums[1] + nums[2];
+        int diff = abs(closest - target);
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < nums.size() - 2; ++i) {
+            int left = i + 1, right = nums.size() - 1;
+            while (left < right) {
+                int sum = nums[i] + nums[left] + nums[right];
+                int newDiff = abs(sum - target);
+                if (diff > newDiff) {
+                    diff = newDiff;
+                    closest = sum;
+                }
+                if (sum < target) ++left;
+                else --right;
+            }
+        }
+        return closest;
+    }
+};
+
+
+18.四数之和
+class Solution {
+public:
+    vector<vector<int>> fourSum(vector<int> &nums, int target) {
+        set<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < int(nums.size() - 3); ++i) {
+            for (int j = i + 1; j < int(nums.size() - 2); ++j) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue;
+                int left = j + 1, right = nums.size() - 1;
+                while (left < right) {
+                    int sum = nums[i] + nums[j] + nums[left] + nums[right];
+                    if (sum == target) {
+                        vector<int> out{nums[i], nums[j], nums[left], nums[right]};
+                        res.insert(out);
+                        ++left; --right;
+                    } else if (sum < target) ++left;
+                    else --right;
+                }
+            }
+        }
+        return vector<vector<int>>(res.begin(), res.end());
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> fourSum(vector<int> &nums, int target) {
+        vector<vector<int>> res;
+        int n = nums.size();
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < n - 3; ++i) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            for (int j = i + 1; j < n - 2; ++j) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue;
+                int left = j + 1, right = n - 1;
+                while (left < right) {
+                    int sum = nums[i] + nums[j] + nums[left] + nums[right];
+                    if (sum == target) {
+                        vector<int> out{nums[i], nums[j], nums[left], nums[right]};
+                        res.push_back(out);
+                        while (left < right && nums[left] == nums[left + 1]) ++left;
+                        while (left < right && nums[right] == nums[right - 1]) --right;
+                        ++left; --right;
+                    } else if (sum < target) ++left;
+                    else --right;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+26.删除排序数组中的重复项
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.empty()) return 0;
+        int pre = 0, cur = 0, n = nums.size();
+        while (cur < n) {
+            if (nums[pre] == nums[cur]) ++cur;
+            else nums[++pre] = nums[cur++];
+        }
+        return pre + 1;
+    }
+};
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.empty()) return 0;
+        int j = 0, n = nums.size();
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] != nums[j]) nums[++j] = nums[i];
+        }
+        return j + 1;
+    }
+};
+
+27.移除元素
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int res = 0;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (nums[i] != val) nums[res++] = nums[i];
+        }
+        return res;
+    }
+};
+
+31.下一个排列，vecor中，下一个更大的数
+class Solution {
+public:
+    void nextPermutation(vector<int> &num) {
+        int i, j, n = num.size();
+        for (i = n - 2; i >= 0; --i) {
+            if (num[i + 1] > num[i]) {
+                for (j = n - 1; j > i; --j) {
+                    if (num[j] > num[i]) break;
+                }
+                swap(num[i], num[j]);
+                reverse(num.begin() + i + 1, num.end());
+                return;
+            }
+        }
+        reverse(num.begin(), num.end());
+    }
+};
+
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {int n = nums.size(), i = n - 2, j = n - 1;
+        while (i >= 0 && nums[i] >= nums[i + 1]) --i;
+        if (i >= 0) {
+            while (nums[j] <= nums[i]) --j;
+            swap(nums[i], nums[j]);
+        }
+        reverse(nums.begin() + i + 1, nums.end());
+    }
+};
+
+33.搜索旋转排序数组
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[mid] < nums[right]) {
+                if (nums[mid] < target && nums[right] >= target) left = mid + 1;
+                else right = mid - 1;
+            } else {
+                if (nums[left] <= target && nums[mid] > target) right = mid - 1;
+                else left = mid + 1;
+            }
+        }
+        return -1;
+    }
+};
+
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size() - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[mid] >= nums[left]) {
+                if (nums[left] <= target && nums[mid] > target) right = mid - 1;
+                else left = mid + 1;
+            } else {
+                if (nums[mid] < target && nums[right] >= target) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+        return -1;
+    }
+};
+
+34.排序数组中，元素第一次和最后一次出现的位置
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        int idx = search(nums, 0, nums.size() - 1, target);
+        if (idx == -1) return {-1, -1};
+        int left = idx, right = idx;
+        while (left > 0 && nums[left - 1] == nums[idx]) --left;
+        while (right < nums.size() - 1 && nums[right + 1] == nums[idx]) ++right;
+        return {left, right};
+    }
+    int search(vector<int>& nums, int left, int right, int target) {
+        if (left > right) return -1;
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) return mid;
+        else if (nums[mid] < target) return search(nums, mid + 1, right, target);
+        else return search(nums, left, mid - 1, target);
+    }
+};
+
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int> res(2, -1);
+        int left = 0, right = nums.size() - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) left = mid + 1;
+            else right = mid;
+        }
+        if (nums[right] != target) return res;
+        res[0] = right;
+        right = nums.size();
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] <= target) left = mid + 1;
+            else right= mid;
+        }
+        res[1] = left - 1;
+        return res;
+    }
+};
+
+35.搜索插入位置，在有序数组中插入一个值
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        for (int i = 0; i < nums.size(); ++i) {
+            if (nums[i] >= target) return i;
+        }
+        return nums.size();
+    }
+};
+
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        if (nums.back() < target) return nums.size();
+        int left = 0, right = nums.size() - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            else if (nums[mid] < target) left = mid + 1;
+            else right = mid;
+        }
+        return right;
+    }
+};
+
+36.有效的数独
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char> > &board) {
+        if (board.empty() || board[0].empty()) return false;
+        int m = board.size(), n = board[0].size();
+        vector<vector<bool> > rowFlag(m, vector<bool>(n, false));
+        vector<vector<bool> > colFlag(m, vector<bool>(n, false));
+        vector<vector<bool> > cellFlag(m, vector<bool>(n, false));
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (board[i][j] >= '1' && board[i][j] <= '9') {
+                    int c = board[i][j] - '1';
+                    if (rowFlag[i][c] || colFlag[c][j] || cellFlag[3 * (i / 3) + j / 3][c]) return false;
+                    rowFlag[i][c] = true;
+                    colFlag[c][j] = true;
+                    cellFlag[3 * (i / 3) + j / 3][c] = true;
+                }
+            }
+        }
+        return true;
+    }
+};
+
+37.解数独
+class Solution {
+public:
+    void solveSudoku(vector<vector<char> > &board) {
+        if (board.empty() || board.size() != 9 || board[0].size() != 9) return;
+        solveSudokuDFS(board, 0, 0);
+    }
+    bool solveSudokuDFS(vector<vector<char> > &board, int i, int j) {
+        if (i == 9) return true;
+        if (j >= 9) return solveSudokuDFS(board, i + 1, 0);
+        if (board[i][j] == '.') {
+            for (int k = 1; k <= 9; ++k) {
+                board[i][j] = (char)(k + '0');
+                if (isValid(board, i , j)) {
+                    if (solveSudokuDFS(board, i, j + 1)) return true;
+                }
+                board[i][j] = '.';
+            }
+        } else {
+            return solveSudokuDFS(board, i, j + 1);
+        }
+        return false;
+    }
+    bool isValid(vector<vector<char> > &board, int i, int j) {
+        for (int col = 0; col < 9; ++col) {
+            if (col != j && board[i][j] == board[i][col]) return false;
+        }
+        for (int row = 0; row < 9; ++row) {
+            if (row != i && board[i][j] == board[row][j]) return false;
+        }
+        for (int row = i / 3 * 3; row < i / 3 * 3 + 3; ++row) {
+            for (int col = j / 3 * 3; col < j / 3 * 3 + 3; ++col) {
+                if ((row != i || col != j) && board[i][j] == board[row][col]) return false;
+            }
+        }
+        return true;
+    }
+};
+
+39.组合总和
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        vector<int> out;
+        combinationSumDFS(candidates, target, 0, out, res);
+        return res;
+    }
+    void combinationSumDFS(vector<int>& candidates, int target, int start, vector<int>& out, vector<vector<int>>& res) {
+        if (target < 0) return;
+        if (target == 0) {res.push_back(out); return;}
+        for (int i = start; i < candidates.size(); ++i) {
+            out.push_back(candidates[i]);
+            combinationSumDFS(candidates, target - candidates[i], i, out, res);
+            out.pop_back();
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        sort(candidates.begin(), candidates.end());
+        for (int i = 0; i < candidates.size(); ++i) {
+            if (candidates[i] > target) break;
+            if (candidates[i] == target) {res.push_back({candidates[i]}); break;}
+            vector<int> vec = vector<int>(candidates.begin() + i, candidates.end());
+            vector<vector<int>> tmp = combinationSum(vec, target - candidates[i]);
+            for (auto a : tmp) {
+                a.insert(a.begin(), candidates[i]);
+                res.push_back(a);
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<vector<int>>> dp;
+        sort(candidates.begin(), candidates.end());
+        for (int i = 1; i <= target; ++i) {
+            vector<vector<int>> cur;
+            for (int j = 0; j < candidates.size(); ++j) {
+                if (candidates[j] > i) break;
+                if (candidates[j] == i) {cur.push_back({candidates[j]}); break;}
+                for (auto a : dp[i - candidates[j] - 1]) {
+                    if (candidates[j] > a[0]) continue;
+                    a.insert(a.begin(), candidates[j]);
+                    cur.push_back(a);
+                }
+            }
+            dp.push_back(cur);
+        }
+        return dp[target - 1];
+    }
+};
+
+40.组合总和2，每个数只能出现一次
+class Solution {
+public:
+    vector<vector<int> > combinationSum2(vector<int> &num, int target) {
+        vector<vector<int> > res;
+        vector<int> out;
+        sort(num.begin(), num.end());
+        combinationSum2DFS(num, target, 0, out, res);
+        return res;
+    }
+    void combinationSum2DFS(vector<int> &num, int target, int start, vector<int> &out, vector<vector<int> > &res) {
+        if (target < 0) return;
+        else if (target == 0) res.push_back(out);
+        else {
+            for (int i = start; i < num.size(); ++i) {
+                if (i > start && num[i] == num[i - 1]) continue;
+                out.push_back(num[i]);
+                combinationSum2DFS(num, target - num[i], i + 1, out, res);
+                out.pop_back();
+            }
+        }
+    }
+};
+
+41.缺失的第一个正数
+// NOT constant space
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        int mx = 0;
+        unordered_set<int> s;
+        for (int num : nums) {
+            if (num <= 0) continue;
+            s.insert(num);
+            mx = max(mx, num);
+        }
+        for (int i = 1; i <= mx; ++i) {
+            if (!s.count(i)) return i;
+        }
+        return mx + 1;
+    }
+};
+
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        int n = nums.size();
+        for (int i = 0; i < n; ++i) {
+            while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i]) {
+                swap(nums[i], nums[nums[i] - 1]);
+            }
+        }
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] != i + 1) return i + 1;
+        }
+        return n + 1;
+    }
+};
+
+42.接雨水
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int res = 0, mx = 0, n = height.size();
+        vector<int> dp(n, 0);
+        for (int i = 0; i < n; ++i) {
+            dp[i] = mx;
+            mx = max(mx, height[i]);
+        }
+        mx = 0;
+        for (int i = n - 1; i >= 0; --i) {
+            dp[i] = min(dp[i], mx);
+            mx = max(mx, height[i]);
+            if (dp[i] > height[i]) res += dp[i] - height[i];
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int res = 0, l = 0, r = height.size() - 1;
+        while (l < r) {
+            int mn = min(height[l], height[r]);
+            if (mn == height[l]) {
+                ++l;
+                while (l < r && height[l] < mn) {
+                    res += mn - height[l++];
+                }
+            } else {
+                --r;
+                while (l < r && height[r] < mn) {
+                    res += mn - height[r--];
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int l = 0, r = height.size() - 1, level = 0, res = 0;
+        while (l < r) {
+            int lower = height[(height[l] < height[r]) ? l++ : r--];
+            level = max(level, lower);
+            res += level - lower;
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        stack<int> st;
+        int i = 0, res = 0, n = height.size();
+        while (i < n) {
+            if (st.empty() || height[i] <= height[st.top()]) {
+                st.push(i++);
+            } else {
+                int t = st.top(); st.pop();
+                if (st.empty()) continue;
+                res += (min(height[i], height[st.top()]) - height[t]) * (i - st.top() - 1);
+            }
+        }
+        return res;
+    }
+};
+
+45.跳跃游戏2
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int res = 0, n = nums.size(), i = 0, cur = 0;
+        while (cur < n - 1) {
+            ++res;
+            int pre = cur;
+            for (; i <= pre; ++i) {
+                cur = max(cur, i + nums[i]);
+            }
+            if (pre == cur) return -1; // May not need this
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int res = 0, n = nums.size(), last = 0, cur = 0;
+        for (int i = 0; i < n - 1; ++i) {
+            cur = max(cur, i + nums[i]);
+            if (i == last) {
+                last = cur;
+                ++res;
+                if (cur >= n - 1) break;
+            }
+        }
+        return res;
+    }
+};
+
+46.全排列：给定一个没有重复数字的序列，返回其所有可能的全排列。
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& num) {
+        vector<vector<int>> res;
+        vector<int> out, visited(num.size(), 0);
+        permuteDFS(num, 0, visited, out, res);
+        return res;
+    }
+    void permuteDFS(vector<int>& num, int level, vector<int>& visited, vector<int>& out, vector<vector<int>>& res) {
+        if (level == num.size()) {res.push_back(out); return;}
+        for (int i = 0; i < num.size(); ++i) {
+            if (visited[i] == 1) continue;
+            visited[i] = 1;
+            out.push_back(num[i]);
+            permuteDFS(num, level + 1, visited, out, res);
+            out.pop_back();
+            visited[i] = 0;
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& num) {
+        vector<vector<int>> res;
+        permuteDFS(num, 0, res);
+        return res;
+    }
+    void permuteDFS(vector<int>& num, int start, vector<vector<int>>& res) {
+        if (start >= num.size()) res.push_back(num);
+        for (int i = start; i < num.size(); ++i) {
+            swap(num[start], num[i]);
+            permuteDFS(num, start + 1, res);
+            swap(num[start], num[i]);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& num) {
+        if (num.empty()) return vector<vector<int>>(1, vector<int>());
+        vector<vector<int>> res;
+        int first = num[0];
+        num.erase(num.begin());
+        vector<vector<int>> words = permute(num);
+        for (auto &a : words) {
+            for (int i = 0; i <= a.size(); ++i) {
+                a.insert(a.begin() + i, first);
+                res.push_back(a);
+                a.erase(a.begin() + i);
+            }
+        }
+        return res;
+    }
+};
+
+47.全排列2：给定一个可包含重复数字的序列，返回所有不重复的全排列。
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> out, visited(nums.size(), 0);
+        sort(nums.begin(), nums.end());
+        permuteUniqueDFS(nums, 0, visited, out, res);
+        return res;
+    }
+    void permuteUniqueDFS(vector<int>& nums, int level, vector<int>& visited, vector<int>& out, vector<vector<int>>& res) {
+        if (level >= nums.size()) {res.push_back(out); return;}
+        for (int i = 0; i < nums.size(); ++i) {
+            if (visited[i] == 1) continue;
+            if (i > 0 && nums[i] == nums[i - 1] && visited[i - 1] == 0) continue;
+            visited[i] = 1;
+            out.push_back(nums[i]);
+            permuteUniqueDFS(nums, level + 1, visited, out, res);
+            out.pop_back();
+            visited[i] = 0;
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        set<vector<int>> res;
+        permute(nums, 0, res);
+        return vector<vector<int>> (res.begin(), res.end());
+    }
+    void permute(vector<int>& nums, int start, set<vector<int>>& res) {
+        if (start >= nums.size()) res.insert(nums);
+        for (int i = start; i < nums.size(); ++i) {
+            if (i != start && nums[i] == nums[start]) continue;
+            swap(nums[i], nums[start]);
+            permute(nums, start + 1, res);
+            swap(nums[i], nums[start]);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        permute(nums, 0, res);
+        return res;
+    }
+    void permute(vector<int> nums, int start, vector<vector<int>>& res) {
+        if (start >= nums.size()) res.push_back(nums);
+        for (int i = start; i < nums.size(); ++i) {
+            if (i != start && nums[i] == nums[start]) continue;
+            swap(nums[i], nums[start]);
+            permute(nums, start + 1, res);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        permute(nums, 0, res);
+        return res;
+    }
+    void permute(vector<int>& nums, int start, vector<vector<int>>& res) {
+        if (start >= nums.size()) res.push_back(nums);
+        for (int i = start; i < nums.size(); ++i) {
+            int j = i - 1;
+            while (j >= start && nums[j] != nums[i]) --j;
+            if (j != start - 1) continue;
+            swap(nums[i], nums[start]);
+            permute(nums, start + 1, res);
+            swap(nums[i], nums[start]);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        if (nums.empty()) return vector<vector<int>>(1, vector<int>());
+        set<vector<int>> res;
+        int first = nums[0];
+        nums.erase(nums.begin());
+        vector<vector<int>> words = permuteUnique(nums);
+        for (auto &a : words) {
+            for (int i = 0; i <= a.size(); ++i) {
+                a.insert(a.begin() + i, first);
+                res.insert(a);
+                a.erase(a.begin() + i);
+            }
+        }
+        return vector<vector<int>> (res.begin(), res.end());
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        res.push_back(nums);
+        while (next_permutation(nums.begin(), nums.end())) {
+            res.push_back(nums);
+        }
+        return res;
+    }
+};
+
+48.旋转数组
+class Solution {
+public:
+    void rotate(vector<vector<int> > &matrix) {
+        int n = matrix.size();
+        for (int i = 0; i < n / 2; ++i) {
+            for (int j = i; j < n - 1 - i; ++j) {
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[n - 1 - j][i];
+                matrix[n - 1 - j][i] = matrix[n - 1 - i][n - 1 - j];
+                matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i];
+                matrix[j][n - 1 - i] = tmp;
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    void rotate(vector<vector<int> > &matrix) {
+        int n = matrix.size();
+        for (int i = 0; i < n - 1; ++i) {
+            for (int j = 0; j < n - i; ++j) {
+                swap(matrix[i][j], matrix[n - 1- j][n - 1 - i]);
+            }
+        }
+        for (int i = 0; i < n / 2; ++i) {
+            for (int j = 0; j < n; ++j) {
+                swap(matrix[i][j], matrix[n - 1 - i][j]);
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    void rotate(vector<vector<int> > &matrix) {
+        int n = matrix.size();
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+            reverse(matrix[i].begin(), matrix[i].end());
+        }
+    }
+};
+
+49.异位词分组
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> res;
+        unordered_map<string, vector<string>> m;
+        for (string str : strs) {
+            string t = str;
+            sort(t.begin(), t.end());
+            m[t].push_back(str);
+        }
+        for (auto a : m) {
+            res.push_back(a.second);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> res;
+        unordered_map<string, vector<string>> m;
+        for (string str : strs) {
+            vector<int> cnt(26, 0);
+            string t = "";
+            for (char c : str) ++cnt[c - 'a'];
+            for (int d : cnt) t += to_string(d) + "/";
+            m[t].push_back(str);
+        }
+        for (auto a : m) {
+            res.push_back(a.second);
+        }
+        return res;
+    }
+};
+
+53.最大子数组
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int res = INT_MIN, curSum = 0;
+        for (int num : nums) {
+            curSum = max(curSum + num, num);
+            res = max(res, curSum);
+        }
+        return res;
+    }
+};
+
+54.螺旋矩阵
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int> > &matrix) {
+        if (matrix.empty() || matrix[0].empty()) return {};
+        int m = matrix.size(), n = matrix[0].size();
+        vector<int> res;
+        int c = m > n ? (n + 1) / 2 : (m + 1) / 2;
+        int p = m, q = n;
+        for (int i = 0; i < c; ++i, p -= 2, q -= 2) {
+            for (int col = i; col < i + q; ++col)
+                res.push_back(matrix[i][col]);
+            for (int row = i + 1; row < i + p; ++row)
+                res.push_back(matrix[row][i + q - 1]);
+            if (p == 1 || q == 1) break;
+            for (int col = i + q - 2; col >= i; --col)
+                res.push_back(matrix[i + p - 1][col]);
+            for (int row = i + p - 2; row > i; --row)
+                res.push_back(matrix[row][i]);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        if (matrix.empty() || matrix[0].empty()) return {};
+        int m = matrix.size(), n = matrix[0].size();
+        vector<int> res;
+        int up = 0, down = m - 1, left = 0, right = n - 1;
+        while (true) {
+            for (int j = left; j <= right; ++j) res.push_back(matrix[up][j]);
+            if (++up > down) break;
+            for (int i = up; i <= down; ++i) res.push_back(matrix[i][right]);
+            if (--right < left) break;
+            for (int j = right; j >= left; --j) res.push_back(matrix[down][j]);
+            if (--down < up) break;
+            for (int i = down; i >= up; --i) res.push_back(matrix[i][left]);
+            if (++left > right) break;
+        }
+        return res;
+    }
+};
+
+55.跳跃游戏，判断能否到达最后
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        vector<int> dp(nums.size(), 0);
+        for (int i = 1; i < nums.size(); ++i) {
+            dp[i] = max(dp[i - 1], nums[i - 1]) - 1;
+            if (dp[i] < 0) return false;
+        }
+        return true;
+    }
+};
+
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n = nums.size(), reach = 0;
+        for (int i = 0; i < n; ++i) {
+            if (i > reach || reach >= n - 1) break;
+            reach = max(reach, i + nums[i]);
+        }
+        return reach >= n - 1;
+    }
+};
+
+56.合并区间
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        if (intervals.empty()) return {};
+        sort(intervals.begin(), intervals.end());
+        vector<vector<int>> res{intervals[0]};
+        for (int i = 1; i < intervals.size(); ++i) {
+            if (res.back()[1] < intervals[i][0]) {
+                res.push_back(intervals[i]);
+            } else {
+                res.back()[1] = max(res.back()[1], intervals[i][1]);
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        int n = intervals.size();
+        vector<vector<int>> res;
+        vector<int> starts, ends;
+        for (int i = 0; i < n; ++i) {
+            starts.push_back(intervals[i][0]);
+            ends.push_back(intervals[i][1]);
+        }
+        sort(starts.begin(), starts.end());
+        sort(ends.begin(), ends.end());
+        for (int i = 0, j = 0; i < n; ++i) {
+            if (i == n - 1 || starts[i + 1] > ends[i]) {
+                res.push_back({starts[j], ends[i]});
+                j = i + 1;
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        vector<vector<int>> res;
+        for (int i = 0; i < intervals.size(); ++i) {
+            res = insert(res, intervals[i]);
+        }
+        return res;
+    }
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int> newInterval) {
+        vector<vector<int>> res;
+        int n = intervals.size(), cur = 0;
+        for (int i = 0; i < n; ++i) {
+            if (intervals[i][1] < newInterval[0]) {
+                res.push_back(intervals[i]);
+                ++cur;
+            } else if (intervals[i][0] > newInterval[1]) {
+                res.push_back(intervals[i]);
+            } else {
+                newInterval[0] = min(newInterval[0], intervals[i][0]);
+                newInterval[1] = max(newInterval[1], intervals[i][1]);
+            }
+        }
+        res.insert(res.begin() + cur, newInterval);
+        return res;
+    }
+};
+
+57.插入区间，在列表中插入一个新的区间，你需要确保列表中的区间仍然有序且不重叠（如果有必要的话，可以合并区间）。
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        int n = intervals.size(), cur = 0;
+        while (cur < n && intervals[cur][1] < newInterval[0]) {
+            res.push_back(intervals[cur++]);
+        }
+        while (cur < n && intervals[cur][0] <= newInterval[1]) {
+            newInterval[0] = min(newInterval[0], intervals[cur][0]);
+            newInterval[1] = max(newInterval[1], intervals[cur][1]);
+            ++cur;
+        }
+        res.push_back(newInterval);
+        while (cur < n) {
+            res.push_back(intervals[cur++]);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        int n = intervals.size(), cur = 0;
+        for (int i = 0; i < n; ++i) {
+            if (intervals[i][1] < newInterval[0]) {
+                res.push_back(intervals[i]);
+                ++cur;
+            } else if (intervals[i][0] > newInterval[1]) {
+                res.push_back(intervals[i]);
+            } else {
+                newInterval[0] = min(newInterval[0], intervals[i][0]);
+                newInterval[1] = max(newInterval[1], intervals[i][1]);
+            }
+        }
+        res.insert(res.begin() + cur, newInterval);
+        return res;
+    }
+};
+
+64.最小路径和，左上到右下数字总和最小
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        if (grid.empty() || grid[0].empty()) return 0;
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<int>> dp(m, vector<int>(n));
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < m; ++i) dp[i][0] = grid[i][0] + dp[i - 1][0];
+        for (int j = 1; j < n; ++j) dp[0][j] = grid[0][j] + dp[0][j - 1];
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                dp[i][j] = grid[i][j] + min(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+};
+
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        if (grid.empty() || grid[0].empty()) return 0;
+        int m = grid.size(), n = grid[0].size();
+        vector<int> dp(n, INT_MAX);
+        dp[0] = 0;
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (j == 0) dp[j] += grid[i][j];
+                else dp[j] = grid[i][j] + min(dp[j], dp[j - 1]);
+            }
+        }
+        return dp[n - 1];
+    }
+};
+
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        if (grid.empty() || grid[0].empty()) return 0;
+        for (int i = 0; i < grid.size(); ++i) {
+            for (int j = 0; j < grid[i].size(); ++j) {
+                if (i == 0 && j == 0) continue;
+                if (i == 0) grid[0][j] += grid[0][j - 1];
+                else if (j == 0) grid[i][0] += grid[i - 1][0];
+                else grid[i][j] += min(grid[i - 1][j], grid[i][j - 1]);
+            }
+        }
+        return grid.back().back();
+    }
+};
+
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        if (grid.empty() || grid[0].empty()) return 0;
+        for (int i = 0; i < grid.size(); ++i) {
+            for (int j = 0; j < grid[i].size(); ++j) {
+                if (i == 0 && j == 0) continue;
+                int up = (i == 0) ? INT_MAX : grid[i - 1][j];
+                int left = (j == 0) ? INT_MAX : grid[i][j - 1];
+                grid[i][j] += min(up, left);
+            }
+        }
+        return grid.back().back();
+    }
+};
+
+66.数组代表的数+1
+class Solution {
+public:
+    vector<int> plusOne(vector<int> &digits) {
+        int n = digits.size();
+        for (int i = n - 1; i >= 0; --i) {
+            if (digits[i] == 9) digits[i] = 0;
+            else {
+                digits[i] += 1;
+                return digits;
+            }
+        }
+        if (digits.front() == 0) digits.insert(digits.begin(), 1);
+        return digits;
+    }
+};
+
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        if (digits.empty()) return digits;
+        int carry = 1, n = digits.size();
+        for (int i = n - 1; i >= 0; --i) {
+            if (carry == 0) return digits;
+            int sum = digits[i] + carry;
+            digits[i] = sum % 10;
+            carry = sum / 10;
+        }
+        if (carry == 1) digits.insert(digits.begin(), 1);
+        return digits;
+    }
+};
+
+68.文本左右对齐，排版
+class Solution {
+public:
+    vector<string> fullJustify(vector<string> &words, int L) {
+        vector<string> res;
+        int i = 0;
+        while (i < words.size()) {
+            int j = i, len = 0;
+            while (j < words.size() && len + words[j].size() + j - i <= L) {
+                len += words[j++].size();
+            }
+            string out;
+            int space = L - len;
+            for (int k = i; k < j; ++k) {
+                out += words[k];
+                if (space > 0) {
+                    int tmp;
+                    if (j == words.size()) {
+                        if (j - k == 1) tmp = space;
+                        else tmp = 1;
+                    } else {
+                        if (j - k - 1 > 0) {
+                            if (space % (j - k - 1) == 0) tmp = space / (j - k - 1);
+                            else tmp = space / (j - k - 1) + 1;
+                        } else tmp = space;
+                    }
+                    out.append(tmp, ' ');
+                    space -= tmp;
+                }
+            }
+            res.push_back(out);
+            i = j;
+        }
+        return res;
+    }
+};
+
+73.矩阵归零，消消乐
+class Solution {
+public:
+    void setZeroes(vector<vector<int> > &matrix) {
+        if (matrix.empty() || matrix[0].empty()) return;
+        int m = matrix.size(), n = matrix[0].size();
+        bool rowZero = false, colZero = false;
+        for (int i = 0; i < m; ++i) {
+            if (matrix[i][0] == 0) colZero = true;
+        }
+        for (int i = 0; i < n; ++i) {
+            if (matrix[0][i] == 0) rowZero = true;
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                if (matrix[i][j] == 0) {
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                if (matrix[0][j] == 0 || matrix[i][0] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (rowZero) {
+            for (int i = 0; i < n; ++i) matrix[0][i] = 0;
+        }
+        if (colZero) {
+            for (int i = 0; i < m; ++i) matrix[i][0] = 0;
+        }
+    }
+};
+
+74.搜索有序二维数组中是否有target
+// Two binary search
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int> > &matrix, int target) {
+        if (matrix.empty() || matrix[0].empty()) return false;
+        if (target < matrix[0][0] || target > matrix.back().back()) return false;
+        int left = 0, right = matrix.size() - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (matrix[mid][0] == target) return true;
+            else if (matrix[mid][0] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        int tmp = right;
+        left = 0;
+        right = matrix[tmp].size() - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (matrix[tmp][mid] == target) return true;
+            else if (matrix[tmp][mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return false;
+    }
+};
+
+// One binary search
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int> > &matrix, int target) {
+        if (matrix.empty() || matrix[0].empty()) return false;
+        if (target < matrix[0][0] || target > matrix.back().back()) return false;
+        int m = matrix.size(), n = matrix[0].size();
+        int left = 0, right = m * n - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (matrix[mid / n][mid % n] == target) return true;
+            else if (matrix[mid / n][mid % n] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return false;
+    }
+};
+
+75.颜色分类，矩阵排序
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        vector<int> colors(3);
+        for (int num : nums) ++colors[num];
+        for (int i = 0, cur = 0; i < 3; ++i) {
+            for (int j = 0; j < colors[i]; ++j) {
+                nums[cur++] = i;
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int red = 0, blue = (int)nums.size() - 1;
+        for (int i = 0; i <= blue; ++i) {
+            if (nums[i] == 0) {
+                swap(nums[i], nums[red++]);
+            } else if (nums[i] == 2) {
+                swap(nums[i--], nums[blue--]);
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int left = 0, right = (int)nums.size() - 1, cur = 0;
+        while (cur <= right) {
+            if (nums[cur] == 0) {
+                swap(nums[cur++], nums[left++]);
+            } else if (nums[cur] == 2) {
+                swap(nums[cur], nums[right--]);
+            } else {
+                ++cur;
+            }
+        }
+    }
+};

@@ -1,0 +1,789 @@
+最长不重复子串
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int res = 0, left = -1, n = s.size();
+        unordered_map<int, int> m;
+        for (int i = 0; i < n; ++i) {
+            if (m.count(s[i]) && m[s[i]] > left) {
+                left = m[s[i]];
+            }
+            m[s[i]] = i;
+            res = max(res, i - left);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        vector<int> m(128, -1);
+        int res = 0, left = -1;
+        for (int i = 0; i < s.size(); ++i) {
+            left = max(left, m[s[i]]);
+            m[s[i]] = i;
+            res = max(res, i - left);
+        }
+        return res;
+    }
+};
+
+最长回文子串
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.size() < 2) return s;
+        int n = s.size(), maxLen = 0, start = 0;
+        for (int i = 0; i < n - 1; ++i) {
+            searchPalindrome(s, i, i, start, maxLen);
+            searchPalindrome(s, i, i + 1, start, maxLen);
+        }
+        return s.substr(start, maxLen);
+    }
+    void searchPalindrome(string s, int left, int right, int& start, int& maxLen) {
+        while (left >= 0 && right < s.size() && s[left] == s[right]) {
+            --left; ++right;
+        }
+        if (maxLen < right - left - 1) {
+            start = left + 1;
+            maxLen = right - left - 1;
+        }
+    }
+};
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.size() < 2) return s;
+        int n = s.size(), maxLen = 0, start = 0;
+        for (int i = 0; i < n;) {
+            if (n - i <= maxLen / 2) break;
+            int left = i, right = i;
+            while (right < n - 1 && s[right + 1] == s[right]) ++right;
+            i = right + 1;
+            while (right < n - 1 && left > 0 && s[right + 1] == s[left - 1]) {
+                ++right; --left;
+            }
+            if (maxLen < right - left + 1) {
+                maxLen = right - left + 1;
+                start = left;
+            }
+        }
+        return s.substr(start, maxLen);
+    }
+};
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.empty()) return "";
+        int dp[s.size()][s.size()] = {0}, left = 0, right = 0, len = 0;
+        for (int i = 0; i < s.size(); ++i) {
+            dp[i][i] = 1;
+            for (int j = 0; j < i; ++j) {
+                dp[j][i] = (s[i] == s[j] && (i - j < 2 || dp[j + 1][i - 1]));
+                if (dp[j][i] && len < i - j + 1) {
+                    len = i - j + 1;
+                    left = j;
+                    right = i;
+                }
+            }
+        }
+        return s.substr(left, right - left + 1);
+    }
+};
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string t ="$#";
+        for (int i = 0; i < s.size(); ++i) {
+            t += s[i];
+            t += '#';
+        }
+        int p[t.size()] = {0}, id = 0, mx = 0, resId = 0, resMx = 0;
+        for (int i = 1; i < t.size(); ++i) {
+            p[i] = mx > i ? min(p[2 * id - i], mx - i) : 1;
+            while (t[i + p[i]] == t[i - p[i]]) ++p[i];
+            if (mx < i + p[i]) {
+                mx = i + p[i];
+                id = i;
+            }
+            if (resMx < p[i]) {
+                resMx = p[i];
+                resId = i;
+            }
+        }
+        return s.substr((resId - resMx) / 2, resMx - 1);
+    }
+};
+
+将string写成Z字型
+class Solution {
+public:
+    string convert(string s, int nRows) {
+        if (nRows <= 1) return s;
+        string res = "";
+        int size = 2 * nRows - 2;
+        for (int i = 0; i < nRows; ++i) {
+            for (int j = i; j < s.size(); j += size) {
+                res += s[j];
+                int tmp = j + size - 2 * i;
+                if (i != 0 && i != nRows - 1 && tmp < s.size()) res += s[tmp];
+            }
+        }
+        return res;
+    }
+};
+
+string转成int
+class Solution {
+public:
+    int myAtoi(string str) {
+        if (str.empty()) return 0;
+        int sign = 1, base = 0, i = 0, n = str.size();
+        while (i < n && str[i] == ' ') ++i;
+        if (i < n && (str[i] == '+' || str[i] == '-')) {
+            sign = (str[i++] == '+') ? 1 : -1;
+        }
+        while (i < n && str[i] >= '0' && str[i] <= '9') {
+            if (base > INT_MAX / 10 || (base == INT_MAX / 10 && str[i] - '0' > 7)) {
+                return (sign == 1) ? INT_MAX : INT_MIN;
+            }
+            base = 10 * base + (str[i++] - '0');
+        }
+        return base * sign;
+    }
+};
+
+string验证正则
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        if (p.empty()) return s.empty();
+        if (p.size() == 1) {
+            return (s.size() == 1 && (s[0] == p[0] || p[0] == '.'));
+        }
+        if (p[1] != '*') {
+            if (s.empty()) return false;
+            return (s[0] == p[0] || p[0] == '.') && isMatch(s.substr(1), p.substr(1));
+        }
+        while (!s.empty() && (s[0] == p[0] || p[0] == '.')) {
+            if (isMatch(s, p.substr(2))) return true;
+            s = s.substr(1);
+        }
+        return isMatch(s, p.substr(2));
+    }
+};
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        if (p.empty()) return s.empty();
+        if (p.size() > 1 && p[1] == '*') {
+            return isMatch(s, p.substr(2)) || (!s.empty() && (s[0] == p[0] || p[0] == '.') && isMatch(s.substr(1), p));
+        } else {
+            return !s.empty() && (s[0] == p[0] || p[0] == '.') && isMatch(s.substr(1), p.substr(1));
+        }
+    }
+};
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m = s.size(), n = p.size();
+        vector<vector<bool>> dp(m + 1, vector<bool>(n + 1, false));
+        dp[0][0] = true;
+        for (int i = 0; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (j > 1 && p[j - 1] == '*') {
+                    dp[i][j] = dp[i][j - 2] || (i > 0 && (s[i - 1] == p[j - 2] || p[j - 2] == '.') && dp[i - 1][j]);
+                } else {
+                    dp[i][j] = i > 0 && dp[i - 1][j - 1] && (s[i - 1] == p[j - 1] || p[j - 1] == '.');
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+
+13.罗马数转换成整数
+class Solution {
+public:
+    int romanToInt(string s) {
+        int res = 0;
+        unordered_map<char, int> m{{'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}};
+        for (int i = 0; i < s.size(); ++i) {
+            int val = m[s[i]];
+            if (i == s.size() - 1 || m[s[i+1]] <= m[s[i]]) res += val;
+            else res -= val;
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int romanToInt(string s) {
+        int res = 0;
+        unordered_map<char, int> m{{'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}};
+        for (int i = 0; i < s.size(); ++i) {
+            if (i == 0 || m[s[i]] <= m[s[i - 1]]) res += m[s[i]];
+            else res += m[s[i]] - 2 * m[s[i - 1]];
+        }
+        return res;
+    }
+};
+
+17.电话号码的数字组合
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) return {};
+        vector<string> res;
+        vector<string> dict{"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        letterCombinationsDFS(digits, dict, 0, "", res);
+        return res;
+    }
+    void letterCombinationsDFS(string& digits, vector<string>& dict, int level, string out, vector<string>& res) {
+        if (level == digits.size()) {res.push_back(out); return;}
+        string str = dict[digits[level] - '0'];
+        for (int i = 0; i < str.size(); ++i) {
+            letterCombinationsDFS(digits, dict, level + 1, out + str[i], res);
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) return {};
+        vector<string> res{""};
+        vector<string> dict{"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        for (int i = 0; i < digits.size(); ++i) {
+            vector<string> t;
+            string str = dict[digits[i] - '0'];
+            for (int j = 0; j < str.size(); ++j) {
+                for (string s : res) t.push_back(s + str[j]);
+            }
+            res = t;
+        }
+        return res;
+    }
+};
+
+20.验证括号
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> parentheses;
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] == '(' || s[i] == '[' || s[i] == '{') parentheses.push(s[i]);
+            else {
+                if (parentheses.empty()) return false;
+                if (s[i] == ')' && parentheses.top() != '(') return false;
+                if (s[i] == ']' && parentheses.top() != '[') return false;
+                if (s[i] == '}' && parentheses.top() != '{') return false;
+                parentheses.pop();
+            }
+        }
+        return parentheses.empty();
+    }
+};
+
+28.寻找子串
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        if (needle.empty()) return 0;
+        int m = haystack.size(), n = needle.size();
+        if (m < n) return -1;
+        for (int i = 0; i <= m - n; ++i) {
+            int j = 0;
+            for (j = 0; j < n; ++j) {
+                if (haystack[i + j] != needle[j]) break;
+            }
+            if (j == n) return i;
+        }
+        return -1;
+    }
+};
+
+30.串联所有单词的子串
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        if (s.empty() || words.empty()) return {};
+        vector<int> res;
+        int n = words.size(), len = words[0].size();
+        unordered_map<string, int> wordCnt;
+        for (auto &word : words) ++wordCnt[word];
+        for (int i = 0; i <= (int)s.size() - n * len; ++i) {
+            unordered_map<string, int> strCnt;
+            int j = 0;
+            for (j = 0; j < n; ++j) {
+                string t = s.substr(i + j * len, len);
+                if (!wordCnt.count(t)) break;
+                ++strCnt[t];
+                if (strCnt[t] > wordCnt[t]) break;
+            }
+            if (j == n) res.push_back(i);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        if (s.empty() || words.empty()) return {};
+        vector<int> res;
+        int n = s.size(), cnt = words.size(), len = words[0].size();
+        unordered_map<string, int> m1;
+        for (string w : words) ++m1[w];
+        for (int i = 0; i < len; ++i) {
+            int left = i, count = 0;
+            unordered_map<string, int> m2;
+            for (int j = i; j <= n - len; j += len) {
+                string t = s.substr(j, len);
+                if (m1.count(t)) {
+                    ++m2[t];
+                    if (m2[t] <= m1[t]) {
+                        ++count;
+                    } else {
+                        while (m2[t] > m1[t]) {
+                            string t1 = s.substr(left, len);
+                            --m2[t1];
+                            if (m2[t1] < m1[t1]) --count;
+                            left += len;
+                        }
+                    }
+                    if (count == cnt) {
+                        res.push_back(left);
+                        --m2[s.substr(left, len)];
+                        --count;
+                        left += len;
+                    }
+                } else {
+                    m2.clear();
+                    count = 0;
+                    left = j + len;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+32.最长有效括号
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int res = 0, start = 0;
+        stack<int> m;
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] == '(') m.push(i);
+            else if (s[i] == ')') {
+                if (m.empty()) start = i + 1;
+                else {
+                    m.pop();
+                    res = m.empty() ? max(res, i - start + 1) : max(res, i - m.top());
+                }
+            }
+        }
+        return res;
+    }
+};
+
+43.大数相乘
+class Solution {
+public:
+    string multiply(string num1, string num2) {
+        string res = "";
+        int m = num1.size(), n = num2.size();
+        vector<int> vals(m + n);
+        for (int i = m - 1; i >= 0; --i) {
+            for (int j = n - 1; j >= 0; --j) {
+                int mul = (num1[i] - '0') * (num2[j] - '0');
+                int p1 = i + j, p2 = i + j + 1, sum = mul + vals[p2];
+                vals[p1] += sum / 10;
+                vals[p2] = sum % 10;
+            }
+        }
+        for (int val : vals) {
+            if (!res.empty() || val != 0) res.push_back(val + '0');
+        }
+        return res.empty() ? "0" : res;
+    }
+};
+
+44.通配符匹配
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int i = 0, j = 0, iStar = -1, jStar = -1;
+        while (i < s.size()) {
+            if (s[i] == p[j] || p[j] == '?') {
+                ++i; ++j;
+            }else if (p[j] == '*') {
+                iStar = i;
+                jStar = j++;
+            } else if (iStar >= 0) {
+                i = ++iStar;
+                j = jStar + 1;
+            } else return false;
+        }
+        while (j < p.size() && p[j] == '*') ++j;
+        return j == p.size();
+    }
+};
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m = s.size(), n = p.size();
+        vector<vector<bool>> dp(m + 1, vector<bool>(n + 1, false));
+        dp[0][0] = true;
+        for (int i = 1; i <= n; ++i) {
+            if (p[i - 1] == '*') dp[0][i] = dp[0][i - 1];
+        }
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (p[j - 1] == '*') {
+                    dp[i][j] = dp[i - 1][j] || dp[i][j - 1];
+                } else {
+                    dp[i][j] = (s[i - 1] == p[j - 1] || p[j - 1] == '?') && dp[i - 1][j - 1];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        return helper(s, p, 0, 0) > 1;
+    }
+    int helper(string& s, string& p, int i, int j) {
+        if (i == s.size() && j == p.size()) return 2;
+        if (i == s.size() && p[j] != '*') return 0;
+        if (j == p.size()) return 1;
+        if (s[i] == p[j] || p[j] == '?') {
+            return helper(s, p, i + 1, j + 1);
+        }
+        if (p[j] == '*') {
+            if (j + 1 < p.size() && p[j + 1] == '*') {
+                return helper(s, p, i, j + 1);
+            }
+            for (int k = 0; k <= (int)s.size() - i; ++k) {
+                int res = helper(s, p, i + k, j + 1);
+                if (res == 0 || res == 2) return res;
+            }
+        }
+        return 1;
+    }
+};
+
+58.最后一个单词的长度
+class Solution {
+public:
+    int lengthOfLastWord(const char *s) {
+        int len = strlen(s);
+        int left = 0;
+        int right = len - 1;
+        int count = 0;
+        while (s[left] == ' ') ++left;
+        while (s[right] == ' ') --right;
+        for (int i = left; i <= right; ++i) {
+            if (s[i] == ' ') count = 0;
+            else ++count;
+        }
+        return count;
+    }
+};
+
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        int res = 0;
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] != ' ') {
+                if (i != 0 && s[i - 1] == ' ') res = 1;
+                else ++res;
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        int right = s.size() - 1, res = 0;
+        while (right >= 0 && s[right] == ' ') --right;
+        while (right >= 0 && s[right] != ' ' ) {
+            --right;
+            ++res;
+        }
+        return res;
+    }
+};
+
+65.有效数字，验证string是否是有效数字
+class Solution {
+public:
+    bool isNumber(string s) {
+        int len = s.size();
+        int left = 0, right = len - 1;
+        bool eExisted = false;
+        bool dotExisted = false;
+        bool digitExisited = false;
+        // Delete spaces in the front and end of string
+        while (s[left] == ' ') ++left;
+        while (s[right] == ' ') --right;
+        // If only have one char and not digit, return false
+        if (left >= right && (s[left] < '0' || s[left] > '9')) return false;
+        //Process the first char
+        if (s[left] == '.') dotExisted = true;
+        else if (s[left] >= '0' && s[left] <= '9') digitExisited = true;
+        else if (s[left] != '+' && s[left] != '-') return false;
+        // Process the middle chars
+        for (int i = left + 1; i <= right - 1; ++i) {
+            if (s[i] >= '0' && s[i] <= '9') digitExisited = true;
+            else if (s[i] == 'e' || s[i] == 'E') { // e/E cannot follow +/-, must follow a digit
+                if (!eExisted && s[i - 1] != '+' && s[i - 1] != '-' && digitExisited) eExisted = true;
+                else return false;
+            } else if (s[i] == '+' || s[i] == '-') { // +/- can only follow e/E
+                if (s[i - 1] != 'e' && s[i - 1] != 'E') return false;
+            } else if (s[i] == '.') { // dot can only occur once and cannot occur after e/E
+                if (!dotExisted && !eExisted) dotExisted = true;
+                else return false;
+            } else return false;
+        }
+        // Process the last char, it can only be digit or dot, when is dot, there should be no dot and e/E before and must follow a digit
+        if (s[right] >= '0' && s[right] <= '9') return true;
+        else if (s[right] == '.' && !dotExisted && !eExisted && digitExisited) return true;
+        else return false;
+    }
+};
+
+class Solution {
+public:
+    bool isNumber(string s) {
+        bool num = false, numAfterE = true, dot = false, exp = false, sign = false;
+        int n = s.size();
+        for (int i = 0; i < n; ++i) {
+            if (s[i] == ' ') {
+                if (i < n - 1 && s[i + 1] != ' ' && (num || dot || exp || sign)) return false;
+            } else if (s[i] == '+' || s[i] == '-') {
+                if (i > 0 && s[i - 1] != 'e' && s[i - 1] != ' ') return false;
+                sign = true;
+            } else if (s[i] >= '0' && s[i] <= '9') {
+                num = true;
+                numAfterE = true;
+            } else if (s[i] == '.') {
+                if (dot || exp) return false;
+                dot = true;
+            } else if (s[i] == 'e') {
+                if (exp || !num) return false;
+                exp = true;
+                numAfterE = false;
+            } else return false;
+        }
+        return num && numAfterE;
+    }
+};
+
+67.二进制求和
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        string res;
+        int na = a.size();
+        int nb = b.size();
+        int n = max(na, nb);
+        bool carry = false;
+        if (na > nb) {
+            for (int i = 0; i < na - nb; ++i) b.insert(b.begin(), '0');
+        }
+        else if (na < nb) {
+            for (int i = 0; i < nb - na; ++i) a.insert(a.begin(), '0');
+        }
+        for (int i = n - 1; i >= 0; --i) {
+            int tmp = 0;
+            if (carry) tmp = (a[i] - '0') + (b[i] - '0') + 1;
+            else tmp = (a[i] - '0') + (b[i] - '0');
+            if (tmp == 0) {
+                res.insert(res.begin(), '0');
+                carry = false;
+            }
+            else if (tmp == 1) {
+                res.insert(res.begin(), '1');
+                carry = false;
+            }
+            else if (tmp == 2) {
+                res.insert(res.begin(), '0');
+                carry = true;
+            }
+            else if (tmp == 3) {
+                res.insert(res.begin(), '1');
+                carry = true;
+            }
+        }
+        if (carry) res.insert(res.begin(), '1');
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        string res = "";
+        int m = a.size() - 1, n = b.size() - 1, carry = 0;
+        while (m >= 0 || n >= 0) {
+            int p = m >= 0 ? a[m--] - '0' : 0;
+            int q = n >= 0 ? b[n--] - '0' : 0;
+            int sum = p + q + carry;
+            res = to_string(sum % 2) + res;
+            carry = sum / 2;
+        }
+        return carry == 1 ? "1" + res : res;
+    }
+};
+
+71.简化路径，规范化linux的路径
+class Solution {
+public:
+    string simplifyPath(string path) {
+        vector<string> v;
+        int i = 0;
+        while (i < path.size()) {
+            while (path[i] == '/' && i < path.size()) ++i;
+            if (i == path.size()) break;
+            int start = i;
+            while (path[i] != '/' && i < path.size()) ++i;
+            int end = i - 1;
+            string s = path.substr(start, end - start + 1);
+            if (s == "..") {
+                if (!v.empty()) v.pop_back();
+            } else if (s != ".") {
+                v.push_back(s);
+            }
+        }
+        if (v.empty()) return "/";
+        string res;
+        for (int i = 0; i < v.size(); ++i) {
+            res += '/' + v[i];
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string res, t;
+        stringstream ss(path);
+        vector<string> v;
+        while (getline(ss, t, '/')) {
+            if (t == "" || t == ".") continue;
+            if (t == ".." && !v.empty()) v.pop_back();
+            else if (t != "..") v.push_back(t);
+        }
+        for (string s : v) res += "/" + s;
+        return res.empty() ? "/" : res;
+    }
+};
+
+72.string的编辑距离
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        int m = word1.size(), n = word2.size();
+        vector<vector<int>> memo(m, vector<int>(n));
+        return helper(word1, 0, word2, 0, memo);
+    }
+    int helper(string& word1, int i, string& word2, int j, vector<vector<int>>& memo) {
+        if (i == word1.size()) return (int)word2.size() - j;
+        if (j == word2.size()) return (int)word1.size() - i;
+        if (memo[i][j] > 0) return memo[i][j];
+        int res = 0;
+        if (word1[i] == word2[j]) {
+            return helper(word1, i + 1, word2, j + 1, memo);
+        } else {
+            int insertCnt = helper(word1, i, word2, j + 1, memo);
+            int deleteCnt = helper(word1, i + 1, word2, j, memo);
+            int replaceCnt = helper(word1, i + 1, word2, j + 1, memo);
+            res = min(insertCnt, min(deleteCnt, replaceCnt)) + 1;
+        }
+        return memo[i][j] = res;
+    }
+};
+
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        int m = word1.size(), n = word2.size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        for (int i = 0; i <= m; ++i) dp[i][0] = i;
+        for (int i = 0; i <= n; ++i) dp[0][i] = i;
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (word1[i - 1] == word2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = min(dp[i - 1][j - 1], min(dp[i - 1][j], dp[i][j - 1])) + 1;
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+
+76.最小覆盖子串
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        string res = "";
+        unordered_map<char, int> letterCnt;
+        int left = 0, cnt = 0, minLen = INT_MAX;
+        for (char c : t) ++letterCnt[c];
+        for (int i = 0; i < s.size(); ++i) {
+            if (--letterCnt[s[i]] >= 0) ++cnt;
+            while (cnt == t.size()) {
+                if (minLen > i - left + 1) {
+                    minLen = i - left + 1;
+                    res = s.substr(left, minLen);
+                }
+                if (++letterCnt[s[left]] > 0) --cnt;
+                ++left;
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        string res = "";
+        vector<int> letterCnt(128, 0);
+        int left = 0, cnt = 0, minLen = INT_MAX;
+        for (char c : t) ++letterCnt[c];
+        for (int i = 0; i < s.size(); ++i) {
+            if (--letterCnt[s[i]] >= 0) ++cnt;
+            while (cnt == t.size()) {
+                if (minLen > i - left + 1) {
+                    minLen = i - left + 1;
+                    res = s.substr(left, minLen);
+                }
+                if (++letterCnt[s[left]] > 0) --cnt;
+                ++left;
+            }
+        }
+        return res;
+    }
+};
+
