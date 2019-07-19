@@ -1,0 +1,63 @@
+关联容器，对象的位置取决于和它关联的键的值
+map中的key是const
+map，不允许有重复的键，但是可以保存重复的对象。map中的元素都是有序的，通过less来比较
+multimap，键比较是可比较的，允许使用重复的键
+unordered_map，顺序不是由键值确定，而是由键值的哈希值绝对，不允许有重复的键
+unordered_multimap，也可以通过键值对来确定对象的位置，允许有重复的键
+multi前缀表示键值不唯一，unordered表示顺序由键值的哈希值确定，而不是比较键值决定
+
+map底层是由平衡二叉树构成的
+std::map<std::string, size_t> people{{"Ann", 25}, {"Bill", 46},{"Jack", 32},{"Jill", 32}};
+std::map<std::string, size_t> people{std::make_pair("Ann",25),std::make_pair("Bill", 46),std::make_pair("Jack", 32),std::make_pair("Jill", 32)};
+
+用另一个map来初始化新的map
+std::map<std::string, size_t> personnel {std::begin(people),std::end(people)};
+
+map插入新数据：
+auto pr = std::make_pair("Fred",22); //Create a pair element and insert it
+auto ret_pr = people.insert(pr);
+
+以参数化列表的形式插入：
+crowd.insert({{"Bert", 44}, {"Ellen”, 99}});
+
+map 容器的成员函数 emplace() 可以在适当的位置直接构造新元素
+std::map<Name, size_t> people;
+auto pr = people.emplace (Name { "Dan","Druff"},77);
+
+获取元素：
+迭代器
+at:people.at(key);
+下标：auto age = people [Name {"Dan", "Druff”}];
+
+删除元素：
+erase：people.erase(name) 里面是key，第一个元素
+
+ pair<T1，T2>
+
+ tuple<> 模板是 pair 模板的泛化
+ auto my_tuple = std::make_tuple (Name{"Peter”，"Piper"},42,std::string{"914 626 7890"})；
+
+ multimap有序map，key可重复
+
+ multimap 容器的成员函数 insert() 可以插入一个或多个元素，而且插入总是成功
+ iter = pets.insert(iter, std::make_pair("dog", "Spot")); // Insert Spot before Fang
+
+ 和 map —样，multimap 的成员函数 emplace() 可以在容器的适当位置构造元素
+
+ emplace_hint() 函数尽可能近地在第一个参数所指向位置的前面生成一个新元素。
+ multimap 不支持下标运算符
+ multimap 也不能使用 at() 函数
+
+ iter = people.find ("Ann");//获得迭代器
+ if (iter != std::end(people))
+ 可以用成员函数 count() 来获取班级的大小
+
+ hash，生成hash码
+ hash碰撞
+
+ unordered_map 使用hash来决定位置的容器
+
+folks 是一个包含 pair<string,size_t> 类型元素的 vector 容器
+
+可以调用 unordered_map 的成员函数 erase() 来移除元素
+iter = people.erase (iter)

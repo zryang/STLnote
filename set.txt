@@ -1,0 +1,43 @@
+set 集合 关联容器，具有共同特征的事物的集合，2个迭代器之间的一系列对象
+set没有单独的键，用less或者hash来排序
+set保存T类型，且保存的的对象是唯一的
+multiSet保存的对象可重复
+unorderd_set使用hash排序
+unordered_multiset使用hash排序且可重复
+有序容器可使用正向或者反向迭代器
+使用无序容器智能使用正向迭代器
+
+std::set<int> numbers {8, 7, 6, 5, 4, 3, 2, 1};
+
+copy() 算法会将前两个参数指定的一段元素复制到第三个参数指定的位置
+会输出有序set序列，因为set是默认使用less排序的
+std::copy( std::begin(numbers), std::end(numbers), std:: ostream_iterator<int>{std::cout," "});
+
+插入：auto pr1 = words.insert("four");
+auto pr = names.emplace("Lisa", "Carr");
+
+删除：
+numbers.erase(13);
+numbers.clear();
+
+查找：
+auto iter = words.find ("one") ;
+
+迭代器：
+成员函数 begin() 和 end() 会返回 iterator 类型的迭代器;
+成员函数 rbegin() 和 rend() 会返回 reverse_iterator 类型的迭代器;
+成员函数 cbegin() 和 cend() 会返回 const_iterator 类型的迭代器。
+成员函数 crbegin() 和 crend() 可以返回 const_reverse_iterator 类型的迭代器。
+所有 set<T> 容器的成员函数返回的迭代器都指向 const T 类型的元素
+这意味着我们不能修改元素。如果想要修改 set 容器中的元素，必须先删除它，然后再插入修改后的版本。
+或者在set中保存指针（智能指针）
+
+第一个版本的 set_union() 函数模板实现了集合的并集运算，它需要 5 个参数：两个迭代器用来指定左操作数的集合范围，另两个迭代器用来作为右操作数的集合范围，还有一个迭代器用来指向结果集合的存放位置
+第二个版本的 set_union() 函数模板接收的第 6 个参数是一个用来比较集合元素的函数对象
+
+除了会创建两个集合的交集而不是并集之外，set_intersection() 算法的用法和 set_union() 相同
+set_difference() 算法可以创建两个集合的差集
+
+includes() 算法可以比较两个元素的集合，如果第一个集合中的全部元素都来自第二个集合，它会返回 true。如果第二个集合是空的集合，它也返回 true。
+
+

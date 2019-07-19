@@ -1,0 +1,55 @@
+定义在algorithm中
+sort<Iter>() 默认会将元素段排成升序，需要支持<运算符
+std::sort(std::begin(numbers), std::end(numbers));
+std::copy(std::begin(numbers), std::end(numbers),std:: ostream_iterator<int> {std::cout," "})
+范围内排序：std::sort(++std::begin(numbers),--std::end(numbers));
+自定义比较元素的函数对象：std::sort(std::begin(numbers), std::end(numbers), std::greater<>());
+
+stable_sort() 算法可以满足我们的要求，它会对一段元素进行排序并保证维持相等元素的原始顺这里有两个版本
+std::stable_sort(std::begin(names), std::end(names),[](const Name& name1, const Name& name2) { return name1.get_second() < name2.get_second(); });
+
+部分排序，只要100万个数据中最小的100个：不会保持未排序元素的原始顺序
+std::partial_sort(std::begin(numbers), std::begin(numbers) + count, std::end(numbers));
+
+可自行执行排序方法来保证剩余元素的顺序
+std::partial_sort_copy(std::begin(numbers), std::end(numbers), std::begin(result), std::end(result),std::greatero());
+
+nth_element() 算法，保证第n个元素左边的都比它大，右边的都比它小
+size_t count {5}; // Index of nth element
+std::nth_element(std::begin(numbers), std::begin(numbers) + count, std::end(numbers));
+
+判断元素是否是有序的：is_sorted
+可以使用反向迭代器来判断是否是逆序
+
+merge() 算法会合并两个序列并将结果保存到第三个序列中
+merge() 算法需要 5 个参数。其中前两个指定第一个输入序列的迭代器，在这个示例中是 these，后面两个迭代器指定第二个输入序列，在这个示例中是 those，最后一个参数是一个指定合并元素存放位置的迭代器，即 both 容器。
+
+find() 为在输入迭代器所定义的范围内查找单个对象的算法，它可以在前两个参数指定的范围内查找和第三个参数相等的第一个对象。
+
+auto iter = std::find(std::begin(numbers), std::end(numbers), value);
+
+find_if() 同 find() 一样，为在输入迭代器所定义的范围内查找单个对象的算法，它可以在前两个参数指定的范围内查找可以使第三个参数指定的谓词返回 true 的第一个对象。谓词不能修改传给它的对象。
+auto iter1 = std::find_if(std::begin(numbers), std::end(numbers),[value](int n) { return n > value; });
+
+find_if_not() 可以在输入迭代器所定义的范围内查找单个对象，该算法会在前两个参数指定的范围内查找可以使第三个参数指定的谓词 返回 false 的第一个对象。谓词不能修改传给它的对象。
+while((start_iter = std::find_if_not(start_iter, end_iter,[five](int n) {return n > five; })) != end_iter)
+
+find_first_of() 算法可以在第一个序列中搜索第二个序列在第一个序列中第一次出现的任何元序列被搜索的范围由输入迭代器指定，但用于确定搜索序列的迭代器至少是正向迭代器。
+auto iter = std::find_first_of (std::begin (text), std:: end (text), std::begin (vowels),std::end(vowels));
+
+adjacent_find() 算法可以用来搜索序列中两个连续相等的元素。如果没有一对相等的元素，这个算法返回这个序列的结束迭代器。
+auto iter = std::adjacent_find(std::begin(saying), std::end(saying));
+
+find_end() 会在一个序列中查找最后一个和另一个元素段匹配的匹配项，也可以看作在一个元素序列中查找子序列的最后一个匹配项。
+
+在查找序列的子序列方面，search() 算法和 find_end() 算法相似，但它所查找的是第一个匹配项而不是最后一个。和 find_end() 算法一样，它也有两个版本，第二个版本接受用来比较元素的谓词作为第 5 个参数。
+
+search_n() 算法会搜索给定元素的匹配项，它在序列中连续出现了给定的次数。它的前两个参数是定义搜索范围的正向迭代器，第 3 个参数是想要查找的第 4 个元素的连续匹配次数。
+
+binary_search() 实现了一个二分查找算法，它会在前两个参数指定范围内搜索等同于第三个参数的元素。
+lower_bound() 算法可以在前两个参数指定的范围内查找不小于第三个参数的第一个元素，也就是说大于等于第三个参数的第一个元素。
+upper_bound() 算法会在前两个参数定义的范围内查找大于第三个参数的第一个元素。
+
+
+
+

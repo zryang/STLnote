@@ -1,0 +1,140 @@
+basic_string，字符类型由模板参数决定
+string通常只读，写操作只能通过成员函数实现
+运算符重载，=，==，+
+string::npos可表示字符串最大长度，通常为无符号int的最大值
+6个构造，支持cin>>str, getline(cin,str)
+
+auto_ptr
+new分配在堆中的内存，需要释放。
+如果将new出来的地址赋给auto_ptr，则在auto_ptr过期时，析构函数将使用delete来自动释放内存
+不存在从普通指针到智能指针的隐式转换
+但是可用普通指针来构造指针指针
+智能指针有隐式计数功能
+auto_ptr <double> pd;
+double *p_reg = new double;
+pd = p_reg; // 不允许
+pd = auto_ptr <double> (p_reg); //允许
+auto_ptr <double> panto =p_reg; //不允许
+auto_ptr <double> pauto (p_reg); //允许
+
+字符集，表示字符和数字之间的映射关系
+C++允许使用任何一种字符集
+
+basic_string是标准字符串模板的实例类
+
+构造：
+string strs //生成空字符串
+string s(str) //生成字符串str的复制品
+string s(str, stridx) //将字符串str中始于stridx的部分作为构造函数的初值
+string s(str, strbegin, strlen) //将字符串str中始于strbegin、长度为strlen的部分作为字符串初值
+string s(cstr) //以C_string类型cstr作为字符串s的初值
+string s(cstr,char_len)    //以C_string类型cstr的前char_len个字符串作为字符串s的初值
+strings(num, c) //生成一个字符串，包含num个c字符
+strings(strs, beg, end)    //以区间[beg, end]内的字符作为字符串s的初值
+
+成员函数：
+size:返回对象中的字符个数
+length:一样的
+maxsize:返回string类型能最多包含的字符数，一般是int的最大值
+capacity:当前容量
+[i]:使用时不检查索引有效性，超出会导致未定义行为
+at(i):会检查下标是否有效，超出会抛出 out_of_range 异常
+>,<,==,>=,<=,!=，2边都不能为NULL
+string中NULL，empty和""的区别
+compare:
+int compare (const basic_string& s) const;
+int compare (const Ch* p) const;
+int compare (size_type pos, size_type n, const basic_string& s) const;
+int compare (size_type pos, size_type n, const basic_string& s,size_type pos2, size_type n2) const;
+int compare (size_type pos, size_type n, const Ch* p, size_type = npos) const;
+
+assign:重新赋值
+basic_string& assign (const E*s); //直接使用字符串赋值
+basic_string& assign (const E*s, size_type n);
+basic_string& assign (const basic_string & str, size_type pos, size_type n);//将str的子串赋值给调用串
+basic_string& assign (const basic_string& str);    //使用字符串的“引用”賦值
+basic_string& assign (size_type n, E c) ; //使用 n个重复字符賦值
+basic_string& assign (const_iterator first, const_iterator last);    //使用迭代器赋值
+
+operator=:赋值
+
+erase:擦除中间内容
+iterator erase (iterator first, iterator last);
+iterator erase (iterator it);
+basic_string& erase (size_type p0 = 0, size_type n = npos);
+
+swap:交换
+void swap (basic_string& str):
+
+insert:插入
+basic_string& insert (size_type p0 , const E * s); //插人 1 个字符至字符串 s 前面
+basic_string& insert (size_type p0 , const E * s, size_type n); // 将 s 的前 3 个字符插入p0 位置
+basic_string& insert (size_type p0, const basic_string& str);
+basic_string& insert (size_type p0, const basic_string& str,size_type pos, size_type n); //选取 str 的子串
+basic_string& insert (size_type p0, size_type n, E c); //在下标 p0 位置插入  n 个字符 c
+iterator insert (iterator it, E c); //在 it 位置插入字符 c
+void insert (iterator it, const_iterator first, const_iterator last); //在字符串前插入字符
+void insert (iterator it, size_type n, E c) ; //在 it 位置重复插入 n 个字符 c
+
+append:在后面追加
+basic_string& append (const E * s); //在原始字符串后面追加字符串s
+basic_string& append (const E * s, size_type n);//在原始字符串后面追加字符串 s 的前 n 个字符
+basic_string& append (const basic_string& str, size_type pos,size_type n);//在原始字符串后面追加字符串 s 的子串 s [ pos,…,pos +n -1]
+basic_string& append (const basic_string& str);
+basic_string& append (size_type n, E c); //追加 n 个重复字符
+basic_string& append (const_iterator first, const_iterator last); //使用迭代器追加
+
+replace:子串替换
+basic_string& replace (size_type p0, size_type n0, const E * s); //使用字符串 s 中的 n 个字符，从源串的位置 P0 处开始替换
+basic_string& replace (size_type p0, size_type n0, const E *s, size_type n); //使用字符串 s 中的 n 个字符，从源串的位置 P0 处开始替换 1 个字符
+basic_string& replace (size_type p0, size_type n0, const basic_string& str); //使用字符串 s 中的 n 个字符，从源串的位置 P0 处开始替换
+basic_string& replace (size_type p0, size_type n0, const basic_string& str, size_type pos, size_type n); //使用串 str 的子串 str [pos, pos + n-1] 替换源串中的内容，从位置 p0 处开始替换，替换字符 n0 个
+basic_string& replace (size_type p0, size_type n0, size_type n, E c); //使用 n 个字符 'c' 替换源串中位置 p0 处开始的 n0 个字符
+basic_string& replace (iterator first0, iterator last0, const E * s);//使用迭代器替换，和 1) 用法类似
+basic_string& replace (iterator first0, iterator last0, const E * s, size_type n);//和 2) 类似
+basic_string& replace (iterator first0, iterator last0, const basic_string& str); //和 3) 类似
+basic_string& replace (iterator first0, iterator last0, size_type n, E c); //和 5) 类似
+basic_string& replace (iterator first0, iterator last0, const_iterator first, const_iterator last); //使用迭代器替换
+
+<<:输出到一个流中
+>>:从流中输入
+getline:从流中读入一行
+getline(cin, s1);
+getline(cin, s2, ' '); 以空格为分隔符，只取分隔符前面的内容
+
+find:查找
+size_type find (value_type _Chr, size_type _Off = 0) const;
+//find()函数的第1个参数是被搜索的字符、第2个参数是在源串中开始搜索的下标位置
+
+size_type find (const value_type* _Ptr , size_type _Off = 0) const;
+//find()函数的第1个参数是被搜索的字符串，第2个参数是在源串中开始搜索的下标位置
+
+size_type find (const value_type* _Ptr, size_type _Off = 0, size_type _Count) const;
+//第1个参数是被搜索的字符串，第2个参数是源串中开始搜索的下标，第3个参数是关于第1个参数的字符个数，可能是 _Ptr 的所有字符数，也可能是 _Ptr 的子串宇符个数
+
+size_type find (const basic_string& _Str, size_type _Off = 0) const;
+//第1个参数是被搜索的字符串，第2参数是在源串中开始搜索的下标位置
+
+rfind:逆向查找
+
+find_first_of:查找第一个
+find_last_of:查找最后一个
+size_type find_first_not_of (value_type_Ch, size_type_Off = 0) const; size_type find_first_of (const value_type* _Ptr, size_type _Off = 0) const;
+size_type find_first_of (const value_type* _Ptr, size_type_Off, size_type_Count) const;
+size_type find_first_of (const basic_string & _Str, size_type_Off = 0) const;
+size_type find_last_of (value_type _Ch, size_type_Off = npos) const;
+size_type find_last_of (const value_type* _Ptr, size_type_Off = npos) const;
+size_type find_last_of (const value_type* _Ptr, size_type _Off, size_type _Count) const;
+size_type find_last_of (const basic_string& _Str, size_type_Off = npos) const;
+
+find_first_not_of:查找第一个不是的
+find_last_not_of:查找最后一个不是的
+
+迭代器：string::iterator
+begin()、end()、rbegin ()、rend()、append()、assign()、insert()、erase()、replace()
+sd2.insert (sd2.begin(), sd3.begin(), sd3.end());
+sd2.replace (sd2.begin (), sd2.end(), "This is an Exarrple of Replace");
+
+
+
+
